@@ -21,6 +21,12 @@ LLM_TIMEOUT_SEC = float(os.getenv("LLM_TIMEOUT_SEC", "120"))          # 120 seco
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
 INTERNAL_SECRET = os.getenv("EXPRESS_INTERNAL_SECRET")
 
+print("=== ENVIRONMENT CHECK ===")
+print("MAX_FILE_SIZE_MB:", MAX_FILE_SIZE_MB)
+print("MAX_FILE_SIZE:", MAX_FILE_SIZE)
+print("LLM_TIMEOUT_SEC:", LLM_TIMEOUT_SEC)
+print("================================")
+
 # -----------------------------
 # Logging
 # -----------------------------
@@ -33,7 +39,13 @@ logger = logging.getLogger("resume-api")
 # -----------------------------
 # App + CORS
 # -----------------------------
-app = FastAPI()
+ENV = os.getenv("ENVIRONMENT", "dev")
+
+app = FastAPI(
+    docs_url=None if ENV == "prod" else "/docs",
+    redoc_url=None if ENV == "prod" else "/redoc",
+    openapi_url=None if ENV == "prod" else "/openapi.json"
+)
 
 # ALLOWED_ORIGINS can be "*", or "https://a.com,https://b.com"
 if ALLOWED_ORIGINS.strip() == "*":
@@ -95,7 +107,6 @@ def _is_effectively_empty(payload: dict) -> bool:
 # -----------------------------
 @app.post("/process")
 async def process_resume(pdf: UploadFile, secret: str = Header(None)):
-    print(secret)
     if secret != INTERNAL_SECRET:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
