@@ -3,8 +3,11 @@ import json
 import default_schema
 import re
 import os
+from dotenv import load_dotenv
 
-HF_API_KEY = os.getenv("API_KEY")
+load_dotenv()
+
+HF_API_KEY = os.getenv("HF_API_KEY")
 
 MODEL_URL = os.getenv("MODEL_URL")
 
@@ -40,7 +43,7 @@ def call_hf_api(prompt: str) -> str:
     response = requests.post(MODEL_URL, headers=HEADERS, json=payload)
     result = response.json()
 
-    print("\n--- HF RAW RESPONSE ---\n", result, "\n------------------------\n")
+    # print("\n--- HF RAW RESPONSE ---\n", result, "\n------------------------\n")
 
     # OpenAI-style / HF-chat style
     if isinstance(result, dict):
@@ -48,8 +51,8 @@ def call_hf_api(prompt: str) -> str:
             raw_content = result["choices"][0]["message"]["content"]
 
             # SAVE EXACT RAW OUTPUT FOR DEBUG
-            with open("last_hf_output.txt", "w", encoding="utf-8") as f:
-                f.write(raw_content)
+            # with open("last_hf_output.txt", "w", encoding="utf-8") as f:
+            #     f.write(raw_content)
 
             return raw_content
         if "generated_text" in result:
@@ -363,14 +366,14 @@ Return ONLY the JSON object. NOTHING else.
 """
 
     output = call_hf_api(prompt)
-    print("=======output======\n\n")
-    print(output)
+    # print("=======output======\n\n")
+    # print(output)
     
 
     raw = safe_json_extract(output)
 
-    print("=======raw======\n\n")
-    print(raw)
+    # print("=======raw======\n\n")
+    # print(raw)
     
     # Enforce schema & fix any missing/wrong fields
     normalized = enforce_schema_format(raw, default_schema.DEFAULT_SCHEMA)
