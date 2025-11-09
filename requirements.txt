@@ -12,7 +12,7 @@ pdfplumber==0.10.3
 pypdfium2==4.20.0
 pillow==10.2.0
 
-PyMuPDF==1.23.9
+PyMuPDF
 
 pydantic==2.7.1
 python-dotenv
